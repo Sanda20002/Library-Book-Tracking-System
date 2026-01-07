@@ -32,14 +32,16 @@ exports.borrowBook = async (req, res) => {
 
     // Create transaction
     const transaction = new Transaction({
-      bookId: book._id,
+      
       isbn: book.isbn,
       bookTitle: book.title,
       borrowerName,
       transactionType: 'borrow',
       borrowedDate,
       dueDate,
-      status: 'active'
+      returnedDate,
+      status: 'active',
+      fineAmount: 0
     });
 
     await transaction.save();
@@ -81,7 +83,7 @@ exports.returnBook = async (req, res) => {
     
     if (returnedDate > transaction.dueDate) {
       const daysOverdue = Math.ceil((returnedDate - transaction.dueDate) / (1000 * 60 * 60 * 24));
-      fineAmount = daysOverdue * 10; // ₹10 per day
+      fineAmount = daysOverdue * 100; // Rs.100 per day
     }
 
     // Update book

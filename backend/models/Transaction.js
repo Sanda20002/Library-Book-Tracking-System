@@ -1,11 +1,7 @@
 const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
-  bookId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Book',
-    required: true
-  },
+  
   isbn: {
     type: String,
     required: true
@@ -44,8 +40,6 @@ const transactionSchema = new mongoose.Schema({
     type: Number,
     default: 0
   }
-}, {
-  timestamps: true
 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);

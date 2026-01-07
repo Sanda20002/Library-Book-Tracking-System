@@ -30,11 +30,11 @@ exports.addBook = async (req, res) => {
       isbn,
       title,
       author,
-      publisher,
-      publicationYear,
       genre,
       shelfLocation,
-      totalCopies
+      status,
+      totalCopies,
+      availableCopies
     } = req.body;
 
     // Check if book with ISBN already exists
@@ -47,11 +47,11 @@ exports.addBook = async (req, res) => {
       isbn,
       title,
       author,
-      publisher,
-      publicationYear,
       genre,
       shelfLocation,
-      totalCopies
+      status,
+      totalCopies,
+      availableCopies
     });
 
     await book.save();

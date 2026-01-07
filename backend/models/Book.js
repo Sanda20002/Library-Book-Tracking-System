@@ -17,15 +17,6 @@ const bookSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  publisher: {
-    type: String,
-    trim: true
-  },
-  publicationYear: {
-    type: Number,
-    min: 1000,
-    max: new Date().getFullYear()
-  },
   genre: {
     type: String,
     trim: true
@@ -50,19 +41,7 @@ const bookSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0
-  },
-  borrowerName: {
-    type: String,
-    default: ''
-  },
-  borrowedDate: {
-    type: Date
-  },
-  dueDate: {
-    type: Date
   }
-}, {
-  timestamps: true
 });
 
 // Update availableCopies before saving

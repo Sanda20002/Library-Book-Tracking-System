@@ -44,12 +44,11 @@ const bookSchema = new mongoose.Schema({
   }
 });
 
-// Update availableCopies before saving
-bookSchema.pre('save', function(next) {
-  if (this.isNew) {
+// Update availableCopies before saving (promise-based middleware, no next callback)
+bookSchema.pre('save', function() {
+  if (this.isNew && (this.availableCopies === undefined || this.availableCopies === null)) {
     this.availableCopies = this.totalCopies;
   }
-  next();
 });
 
 module.exports = mongoose.model('Book', bookSchema);

@@ -32,14 +32,13 @@ exports.borrowBook = async (req, res) => {
 
     // Create transaction
     const transaction = new Transaction({
-      
+      bookId: book._id,
       isbn: book.isbn,
       bookTitle: book.title,
       borrowerName,
       transactionType: 'borrow',
       borrowedDate,
       dueDate,
-      returnedDate,
       status: 'active',
       fineAmount: 0
     });

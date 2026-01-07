@@ -26,6 +26,15 @@ app.get('/', (req, res) => {
   res.json({ message: 'Library Management API' });
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ 
+    message: 'Server error', 
+    error: err.message || 'An unexpected error occurred'
+  });
+});
+
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

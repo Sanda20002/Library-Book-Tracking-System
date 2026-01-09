@@ -4,10 +4,10 @@ const Transaction = require('../models/Transaction');
 // Borrow a book
 exports.borrowBook = async (req, res) => {
   try {
-    const { bookId, borrowerName, dueDays = 14 } = req.body;
+    const { isbn, borrowerName, dueDays = 14 } = req.body;
 
     // Find the book
-    const book = await Book.findById(bookId);
+    const book = await Book.findOne({ isbn });
     if (!book) {
       return res.status(404).json({ message: 'Book not found' });
     }
@@ -32,7 +32,7 @@ exports.borrowBook = async (req, res) => {
 
     // Create transaction
     const transaction = new Transaction({
-      bookId: book._id,
+      
       isbn: book.isbn,
       bookTitle: book.title,
       borrowerName,
@@ -71,7 +71,7 @@ exports.returnBook = async (req, res) => {
     }
 
     // Find the book
-    const book = await Book.findById(transaction.bookId);
+    const book = await Book.findOne({ isbn: transaction.isbn });
     if (!book) {
       return res.status(404).json({ message: 'Book not found' });
     }

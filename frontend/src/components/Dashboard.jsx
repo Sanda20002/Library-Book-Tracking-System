@@ -152,4 +152,5 @@ const Dashboard = () => {
   );
 };
 
+//export Dashboard component
 export default Dashboard;

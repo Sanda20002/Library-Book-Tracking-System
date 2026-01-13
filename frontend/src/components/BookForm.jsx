@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { bookAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import '../styles/BookForm.css';
 
 const BookForm = () => {
   const navigate = useNavigate();
@@ -85,14 +86,14 @@ const BookForm = () => {
   };
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="bookform-page p-4 md:p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Add New Book</h1>
           <p className="text-gray-600 mt-2">Fill in the details to add a new book to the library</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="bookform-card bg-white rounded-xl shadow-md p-6">
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* ISBN */}
@@ -277,7 +278,7 @@ const BookForm = () => {
           </form>
         </div>
 
-        <div className="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-6">
+        <div className="bookform-tips mt-8 bg-blue-50 border border-blue-100 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-blue-800 mb-3">💡 Tips for Adding Books</h3>
           <ul className="text-blue-700 space-y-2">
             <li className="flex items-start">

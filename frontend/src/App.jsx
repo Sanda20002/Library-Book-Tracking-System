@@ -5,11 +5,12 @@ import Dashboard from './components/Dashboard';
 import BookList from './components/BookList';
 import BookForm from './components/BookForm';
 import BorrowReturn from './components/BorrowReturn';
+import './styles/App.css';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
+      <div className="app-shell min-h-screen bg-gray-50">
         <Navbar />
         <div className="container mx-auto">
           <Routes>
@@ -22,7 +23,7 @@ function App() {
         </div>
         
         {/* Footer */}
-        <footer className="mt-12 border-t border-gray-200 bg-white">
+        <footer className="app-footer mt-12 border-t border-gray-200 bg-white">
           <div className="container mx-auto px-4 py-8">
             <div className="text-center text-gray-600">
               <p>📖 Library Management System</p>

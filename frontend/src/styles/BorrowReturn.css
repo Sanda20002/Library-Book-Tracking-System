@@ -1,0 +1,41 @@
+.borrow-return-page {
+  background: radial-gradient(circle at top left, #eff6ff 0, #f9fafb 40%, #ffffff 100%);
+}
+
+.borrow-tabs button {
+  position: relative;
+}
+
+.borrow-tabs button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: #2563eb;
+  transition: width 0.25s ease;
+}
+
+.borrow-tabs button[aria-current="true"]::after {
+  width: 100%;
+}
+
+.borrow-card,
+.return-card {
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+  border-radius: 1rem;
+}
+
+.borrow-scroll-list {
+  scrollbar-width: thin;
+}
+
+.borrow-scroll-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.borrow-scroll-list::-webkit-scrollbar-thumb {
+  background: #cbd5f5;
+  border-radius: 999px;
+}

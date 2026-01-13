@@ -1,0 +1,21 @@
+.dashboard-page {
+  background: radial-gradient(circle at top left, #eff6ff 0, #f9fafb 50%, #ffffff 100%);
+}
+
+.dashboard-stat-card {
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+  border-radius: 1rem;
+}
+
+.dashboard-stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.dashboard-quick-actions a {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.dashboard-quick-actions a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+}

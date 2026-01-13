@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { bookAPI, transactionAPI } from '../services/api';
+import '../styles/BorrowReturn.css';
 
 const BorrowReturn = () => {
   const [activeSection, setActiveSection] = useState('borrow');
@@ -154,7 +155,7 @@ const BorrowReturn = () => {
   }
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="borrow-return-page p-4 md:p-6">
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Borrow & Return Books</h1>
@@ -162,7 +163,7 @@ const BorrowReturn = () => {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex border-b border-gray-200 mb-8">
+      <div className="borrow-tabs flex border-b border-gray-200 mb-8">
         <button
           onClick={() => setActiveSection('borrow')}
           className={`px-6 py-3 font-medium text-sm transition-colors ${
@@ -170,6 +171,7 @@ const BorrowReturn = () => {
               ? 'border-b-2 border-blue-600 text-blue-600'
               : 'text-gray-500 hover:text-gray-700'
           }`}
+          aria-current={activeSection === 'borrow' ? 'true' : 'false'}
         >
           📚 Borrow Book
         </button>
@@ -180,6 +182,7 @@ const BorrowReturn = () => {
               ? 'border-b-2 border-blue-600 text-blue-600'
               : 'text-gray-500 hover:text-gray-700'
           }`}
+          aria-current={activeSection === 'return' ? 'true' : 'false'}
         >
           🔄 Return Book
         </button>
@@ -190,6 +193,7 @@ const BorrowReturn = () => {
               ? 'border-b-2 border-blue-600 text-blue-600'
               : 'text-gray-500 hover:text-gray-700'
           }`}
+          aria-current={activeSection === 'active' ? 'true' : 'false'}
         >
           ⏳ Active Borrowings
         </button>
@@ -200,6 +204,7 @@ const BorrowReturn = () => {
               ? 'border-b-2 border-blue-600 text-blue-600'
               : 'text-gray-500 hover:text-gray-700'
           }`}
+          aria-current={activeSection === 'recent' ? 'true' : 'false'}
         >
           📝 Recent Transactions
         </button>
@@ -209,7 +214,7 @@ const BorrowReturn = () => {
       {activeSection === 'borrow' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Borrow Form */}
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="borrow-card bg-white rounded-xl shadow-md p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-6">Borrow a Book</h2>
             <form onSubmit={handleBorrowSubmit}>
               <div className="space-y-6">
@@ -321,7 +326,7 @@ const BorrowReturn = () => {
                 <p className="text-gray-600">All books are currently borrowed</p>
               </div>
             ) : (
-              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+              <div className="borrow-scroll-list space-y-4 max-h-[500px] overflow-y-auto pr-2">
                 {getAvailableBooks().map((book) => (
                   <div
                     key={book._id}
@@ -359,7 +364,7 @@ const BorrowReturn = () => {
       {activeSection === 'return' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Return Form */}
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="return-card bg-white rounded-xl shadow-md p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-6">Return a Book</h2>
             <form onSubmit={handleReturnSubmit}>
               <div className="space-y-6">

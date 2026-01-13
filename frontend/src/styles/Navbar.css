@@ -1,0 +1,28 @@
+.navbar {
+  backdrop-filter: blur(12px);
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+}
+
+.navbar-brand {
+  letter-spacing: 0.04em;
+}
+
+.navbar-links a {
+  position: relative;
+}
+
+.navbar-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.8);
+  transition: width 0.25s ease;
+}
+
+.navbar-links a:hover::after,
+.navbar-links a.active::after {
+  width: 100%;
+}

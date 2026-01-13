@@ -1,0 +1,25 @@
+.booklist-page {
+  background: linear-gradient(135deg, #f3f4ff 0, #f9fafb 40%, #ffffff 100%);
+}
+
+.booklist-table-wrapper {
+  border-radius: 1rem;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+}
+
+.booklist-table thead th {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.booklist-table tbody tr {
+  transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.booklist-table tbody tr:hover {
+  transform: translateY(-1px);
+}
+
+.booklist-empty-state {
+  background: radial-gradient(circle at top, #dbeafe, #eff6ff 45%, #ffffff 100%);
+}

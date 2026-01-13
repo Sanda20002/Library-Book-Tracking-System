@@ -1,0 +1,12 @@
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-footer {
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+}
+
+.app-footer small {
+  letter-spacing: 0.06em;
+}

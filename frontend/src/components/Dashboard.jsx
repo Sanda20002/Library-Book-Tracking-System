@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { transactionAPI } from '../services/api';
+import '../styles/Dashboard.css';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -84,7 +85,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="dashboard-page p-4 md:p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Library Dashboard</h1>
         <p className="text-gray-600 mt-2">Overview of library activities and statistics</p>
@@ -92,7 +93,7 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {statCards.map((stat, index) => (
-          <div key={index} className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow">
+          <div key={index} className="dashboard-stat-card bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm font-medium">{stat.title}</p>
@@ -115,7 +116,7 @@ const Dashboard = () => {
       </div>
 
       <div className="mt-12">
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="bg-white rounded-xl shadow-md p-6 dashboard-quick-actions">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <a href="/add-book" className="block p-4 bg-blue-50 rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors">

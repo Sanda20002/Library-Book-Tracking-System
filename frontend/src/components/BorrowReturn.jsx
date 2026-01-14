@@ -31,15 +31,29 @@ const BorrowReturn = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [booksRes, transactionsRes, activeRes] = await Promise.all([
-        bookAPI.getAll(),
-        transactionAPI.getAll(),
-        transactionAPI.getActive()
-      ]);
-      
-      setBooks(booksRes.data);
-      setTransactions(transactionsRes.data.slice(0, 10)); // Show only recent 10
-      setActiveBorrowings(activeRes.data);
+      // Always load books; this drives the dropdown
+      const booksRes = await bookAPI.getAll();
+
+      // Load all transactions, but don't break if this fails
+      let transactionsRes;
+      try {
+        transactionsRes = await transactionAPI.getAll();
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+      }
+
+      // Load active borrowings separately so a failure here
+      // does not stop books from showing
+      let activeRes;
+      try {
+        activeRes = await transactionAPI.getActive();
+      } catch (error) {
+        console.error('Error fetching active borrowings:', error);
+      }
+
+      setBooks(booksRes.data || []);
+      setTransactions((transactionsRes?.data || []).slice(0, 10)); // Show only recent 10
+      setActiveBorrowings(activeRes?.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       alert('Failed to load data. Please try again.');
@@ -468,46 +482,36 @@ const BorrowReturn = () => {
 
       {/* Active Borrowings Section */}
       {activeSection === 'active' && (
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-800">All Active Borrowings</h2>
-            <div className="text-sm text-gray-500">
+        <div className="section-card">
+          <div className="section-card-header">
+            <h2>All Active Borrowings</h2>
+            <div className="section-card-sub">
               {activeBorrowings.length} active borrowing{activeBorrowings.length !== 1 ? 's' : ''}
             </div>
           </div>
 
           {activeBorrowings.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">📚</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-3">No Active Borrowings</h3>
-              <p className="text-gray-600 mb-6">All books are currently available in the library</p>
+            <div className="empty-state">
+              <div className="empty-icon">📚</div>
+              <h3 className="empty-title">No Active Borrowings</h3>
+              <p className="empty-description">All books are currently available in the library</p>
               <a 
                 href="/books"
-                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                className="empty-action-btn"
               >
                 Browse Available Books
               </a>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className="table-view">
+              <table className="transaction-table active-borrowings-table">
+                <thead>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Book Details
-                    </th>
-                    <th>
-                      Borrower Info
-                    </th>
-                    <th>
-                      Dates
-                    </th>
-                    <th>
-                      Status
-                    </th>
-                    <th>
-                      Actions
-                    </th>
+                    <th>Book Details</th>
+                    <th>Borrower Info</th>
+                    <th>Dates</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>

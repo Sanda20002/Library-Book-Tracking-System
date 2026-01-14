@@ -658,6 +658,22 @@
   vertical-align: middle;
 }
 
+/* Active Borrowings table cell text */
+.active-borrowings-table th {
+  white-space: nowrap;
+}
+
+.table-book-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.table-book-sub {
+  font-size: 0.813rem;
+  color: #6b7280;
+}
+
 .return-btn {
   background: linear-gradient(135deg, #10b981, #059669);
   color: #ffffff;

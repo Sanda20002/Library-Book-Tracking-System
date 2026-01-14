@@ -22,7 +22,13 @@ export const bookAPI = {
 // Transactions API
 export const transactionAPI = {
   getAll: () => api.get('/transactions'),
-  getActive: () => api.get('/transactions/active'),
+  // Get active borrowings by filtering all transactions on the client
+  getActive: () =>
+    api.get('/transactions').then((res) => ({
+      data: res.data.filter(
+        (t) => t.transactionType === 'borrow' && t.status === 'active'
+      ),
+    })),
   getDashboard: () => api.get('/transactions/dashboard'),
   borrow: (data) => api.post('/transactions/borrow', data),
   return: (data) => api.post('/transactions/return', data),

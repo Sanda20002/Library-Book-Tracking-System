@@ -128,10 +128,8 @@ exports.getActiveBorrowings = async (req, res) => {
     const borrowings = await Transaction.find({
       transactionType: 'borrow',
       status: 'active'
-    })
-    .populate('bookId', 'title author isbn')
-    .sort({ dueDate: 1 });
-    
+    }).sort({ dueDate: 1 });
+
     res.json(borrowings);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

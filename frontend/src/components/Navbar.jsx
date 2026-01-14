@@ -15,7 +15,7 @@ const Navbar = () => {
       <div className="navbar-container">
         <div className="navbar-brand">
           <span className="navbar-brand-icon">📖</span>
-          <span>Library System</span>
+          <span>Library Management System</span>
         </div>
 
         <div className="nav-links">

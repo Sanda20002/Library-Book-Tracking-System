@@ -51,4 +51,5 @@ bookSchema.pre('save', function() {
   }
 });
 
+//export bookSchema
 module.exports = mongoose.model('Book', bookSchema);

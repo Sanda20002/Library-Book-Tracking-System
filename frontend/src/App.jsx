@@ -7,6 +7,7 @@ import BookForm from './components/BookForm';
 import BorrowReturn from './components/BorrowReturn';
 import Footer from './components/Footer';
 import { NotificationProvider } from './context/NotificationContext';
+import MemberList from './components/MemberList';
 
 function App() {
   return (
@@ -21,6 +22,8 @@ function App() {
               <Route path="/add-book" element={<BookForm />} />
               <Route path="/borrow-return" element={<BorrowReturn />} />
               <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="/members" element={<MemberList />}
+               />
             </Routes>
           </div>
           <Footer />

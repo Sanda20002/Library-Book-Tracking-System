@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const bookRoutes = require('./routes/bookRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
+const memberRoutes = require('./routes/memberRoutes');
 
 const app = express();
 
@@ -20,6 +21,7 @@ mongoose.connect(process.env.MONGODB_URL)
 // Routes
 app.use('/api/books', bookRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/members', memberRoutes);
 
 // Root route
 app.get('/', (req, res) => {

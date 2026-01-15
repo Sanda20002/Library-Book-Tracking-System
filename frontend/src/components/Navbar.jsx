@@ -8,6 +8,7 @@ const Navbar = () => {
     { path: '/books', label: 'Books', icon: '📚' },
     { path: '/add-book', label: 'Add Book', icon: '➕' },
     { path: '/borrow-return', label: 'Borrow/Return', icon: '🔄' },
+    { path: '/members', label: 'Members', icon: '👥' },
   ];
 
   return (

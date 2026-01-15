@@ -34,4 +34,15 @@ export const transactionAPI = {
   return: (data) => api.post('/transactions/return', data),
 };
 
+// Members API
+export const memberAPI = {
+  register: (memberData) => api.post('/members/register', memberData),
+  getAll: () => api.get('/members'),
+  getById: (id) => api.get(`/members/${id}`),
+  getByEmail: (email) => api.get(`/members/email/${email}`),
+  search: (query) => api.get(`/members/search?query=${query}`),
+  update: (id, memberData) => api.put(`/members/${id}`, memberData),
+  delete: (id) => api.delete(`/members/${id}`),
+};
+
 export default api;

@@ -8,6 +8,8 @@ const BookList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [bookToDelete, setBookToDelete] = useState(null);
+  const [editingLocationId, setEditingLocationId] = useState(null);
+  const [locationDraft, setLocationDraft] = useState('');
 
   useEffect(() => {
     fetchBooks();
@@ -43,6 +45,36 @@ const BookList = () => {
   const handleDeleteClick = (book) => {
     setBookToDelete(book);
     setShowDeleteModal(true);
+  };
+
+  const startEditLocation = (book) => {
+    setEditingLocationId(book._id);
+    setLocationDraft(book.shelfLocation || '');
+  };
+
+  const cancelEditLocation = () => {
+    setEditingLocationId(null);
+    setLocationDraft('');
+  };
+
+  const saveLocation = async (book) => {
+    const trimmed = locationDraft.trim();
+    if (!trimmed) {
+      alert('Location cannot be empty');
+      return;
+    }
+
+    try {
+      const response = await bookAPI.update(book._id, { shelfLocation: trimmed });
+      const updatedBook = response.data.book || { ...book, shelfLocation: trimmed };
+      setBooks((prev) => prev.map((b) => (b._id === book._id ? updatedBook : b)));
+      alert('Location updated successfully');
+      setEditingLocationId(null);
+      setLocationDraft('');
+    } catch (error) {
+      console.error('Error updating location:', error);
+      alert('Failed to update location. Please try again.');
+    }
   };
 
   const confirmDelete = async () => {
@@ -147,7 +179,46 @@ const BookList = () => {
                       <div className="author-cell">{book.author}</div>
                     </td>
                     <td>
-                      <div className="location-cell">{book.shelfLocation}</div>
+                      <div className="location-cell">
+                        {editingLocationId === book._id ? (
+                          <div className="location-edit">
+                            <input
+                              type="text"
+                              value={locationDraft}
+                              onChange={(e) => setLocationDraft(e.target.value)}
+                              className="location-input"
+                              placeholder="Enter location"
+                            />
+                            <div className="location-edit-actions">
+                              <button
+                                type="button"
+                                onClick={() => saveLocation(book)}
+                                className="location-save-btn"
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                onClick={cancelEditLocation}
+                                className="location-cancel-btn"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="location-display">
+                            <span>{book.shelfLocation}</span>
+                            <button
+                              type="button"
+                              onClick={() => startEditLocation(book)}
+                              className="location-edit-btn"
+                            >
+                              Edit
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td>
                       <div className="copies-cell">

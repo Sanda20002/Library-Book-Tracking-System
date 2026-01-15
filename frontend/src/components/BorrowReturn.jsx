@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { bookAPI, transactionAPI } from '../services/api';
+import { useNotification } from '../context/NotificationContext';
 import '../styles/BorrowReturn.css';
 
 const BorrowReturn = () => {
@@ -10,6 +11,7 @@ const BorrowReturn = () => {
   const [loading, setLoading] = useState(true);
   const [borrowLoading, setBorrowLoading] = useState(false);
   const [returnLoading, setReturnLoading] = useState(false);
+  const { showNotification } = useNotification();
 
   // Borrow form state
   const [borrowForm, setBorrowForm] = useState({
@@ -56,7 +58,7 @@ const BorrowReturn = () => {
       setActiveBorrowings(activeRes?.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
-      alert('Failed to load data. Please try again.');
+      showNotification('Failed to load data. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
@@ -80,7 +82,7 @@ const BorrowReturn = () => {
     e.preventDefault();
     
     if (!borrowForm.isbn || !borrowForm.borrowerName) {
-      alert('Please fill in all required fields');
+      showNotification('Please fill in all required fields.', 'warning');
       return;
     }
 
@@ -88,12 +90,13 @@ const BorrowReturn = () => {
     
     try {
       const response = await transactionAPI.borrow(borrowForm);
-      alert(`✅ Book borrowed successfully!\nDue Date: ${new Date(response.data.transaction.dueDate).toLocaleDateString()}`);
+      const dueDate = new Date(response.data.transaction.dueDate).toLocaleDateString();
+      showNotification(`Book borrowed successfully! Due Date: ${dueDate}`, 'success');
       setBorrowForm({ isbn: '', borrowerName: '', dueDays: 14 });
       fetchData(); // Refresh data
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Error borrowing book';
-      alert(`❌ ${errorMessage}`);
+      showNotification(errorMessage, 'error');
     } finally {
       setBorrowLoading(false);
     }
@@ -103,7 +106,7 @@ const BorrowReturn = () => {
     e.preventDefault();
     
     if (!returnForm.transactionId) {
-      alert('Please select a transaction to return');
+      showNotification('Please select a transaction to return.', 'warning');
       return;
     }
 
@@ -112,15 +115,15 @@ const BorrowReturn = () => {
     try {
       const response = await transactionAPI.return(returnForm);
       if (response.data.fineAmount > 0) {
-        alert(`✅ Book returned successfully!\nFine Amount: Rs. ${response.data.fineAmount}`);
+        showNotification(`Book returned successfully! Fine Amount: Rs. ${response.data.fineAmount}`, 'success');
       } else {
-        alert('✅ Book returned successfully! No fine charged.');
+        showNotification('Book returned successfully! No fine charged.', 'success');
       }
       setReturnForm({ transactionId: '' });
       fetchData(); // Refresh data
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Error returning book';
-      alert(`❌ ${errorMessage}`);
+      showNotification(errorMessage, 'error');
     } finally {
       setReturnLoading(false);
     }

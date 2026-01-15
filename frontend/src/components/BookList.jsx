@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { bookAPI } from '../services/api';
+import { useNotification } from '../context/NotificationContext';
 import '../styles/BookList.css';
 
 const BookList = () => {
@@ -10,6 +11,7 @@ const BookList = () => {
   const [bookToDelete, setBookToDelete] = useState(null);
   const [editingLocationId, setEditingLocationId] = useState(null);
   const [locationDraft, setLocationDraft] = useState('');
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     fetchBooks();
@@ -21,7 +23,7 @@ const BookList = () => {
       setBooks(response.data);
     } catch (error) {
       console.error('Error fetching books:', error);
-      alert('Failed to load books. Please try again.');
+      showNotification('Failed to load books. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
@@ -38,7 +40,7 @@ const BookList = () => {
       setBooks(response.data);
     } catch (error) {
       console.error('Error searching books:', error);
-      alert('Search failed. Please try again.');
+      showNotification('Search failed. Please try again.', 'error');
     }
   };
 
@@ -60,7 +62,7 @@ const BookList = () => {
   const saveLocation = async (book) => {
     const trimmed = locationDraft.trim();
     if (!trimmed) {
-      alert('Location cannot be empty');
+      showNotification('Location cannot be empty.', 'warning');
       return;
     }
 
@@ -68,12 +70,12 @@ const BookList = () => {
       const response = await bookAPI.update(book._id, { shelfLocation: trimmed });
       const updatedBook = response.data.book || { ...book, shelfLocation: trimmed };
       setBooks((prev) => prev.map((b) => (b._id === book._id ? updatedBook : b)));
-      alert('Location updated successfully');
+      showNotification('Location updated successfully.', 'success');
       setEditingLocationId(null);
       setLocationDraft('');
     } catch (error) {
       console.error('Error updating location:', error);
-      alert('Failed to update location. Please try again.');
+      showNotification('Failed to update location. Please try again.', 'error');
     }
   };
 
@@ -83,10 +85,10 @@ const BookList = () => {
     try {
       await bookAPI.delete(bookToDelete._id);
       setBooks((prevBooks) => prevBooks.filter((book) => book._id !== bookToDelete._id));
-      alert('Book deleted successfully!');
+      showNotification('Book deleted successfully.', 'success');
     } catch (error) {
       console.error('Error deleting book:', error);
-      alert('Failed to delete book. Please try again.');
+      showNotification('Failed to delete book. Please try again.', 'error');
     } finally {
       setShowDeleteModal(false);
       setBookToDelete(null);

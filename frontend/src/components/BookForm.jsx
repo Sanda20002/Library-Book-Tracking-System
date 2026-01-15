@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { bookAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { useNotification } from '../context/NotificationContext';
 import '../styles/BookForm.css';
 
 const BookForm = () => {
@@ -18,6 +19,7 @@ const BookForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const { showNotification } = useNotification();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,11 +62,11 @@ const BookForm = () => {
     
     try {
       await bookAPI.add(formData);
-      alert('✅ Book added successfully!');
+      showNotification('Book added successfully!', 'success');
       navigate('/books');
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Error adding book';
-      alert(`❌ ${errorMessage}`);
+      showNotification(errorMessage, 'error');
       console.error('Error:', error);
     } finally {
       setLoading(false);

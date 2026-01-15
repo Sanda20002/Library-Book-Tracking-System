@@ -7,7 +7,6 @@ import '../styles/BookForm.css';
 const BookForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    isbn: '',
     title: '',
     author: '',
     genre: '',
@@ -37,7 +36,6 @@ const BookForm = () => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.isbn.trim()) newErrors.isbn = 'ISBN is required';
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.author.trim()) newErrors.author = 'Author is required';
     if (!formData.shelfLocation.trim()) newErrors.shelfLocation = 'Shelf location is required';
@@ -75,7 +73,6 @@ const BookForm = () => {
 
   const handleReset = () => {
     setFormData({
-      isbn: '',
       title: '',
       author: '',
       genre: '',
@@ -100,19 +97,14 @@ const BookForm = () => {
               {/* ISBN */}
               <div className="form-group">
                 <label className="form-label">
-                  ISBN *
+                  ISBN
                 </label>
                 <input
                   type="text"
-                  name="isbn"
-                  value={formData.isbn}
-                  onChange={handleChange}
-                  className={`form-input ${errors.isbn ? 'error' : ''}`}
-                  placeholder="978-3-16-148410-0"
+                  className="form-input"
+                  value="Will be generated automatically when the book is saved"
+                  disabled
                 />
-                {errors.isbn && (
-                  <p className="error-message">{errors.isbn}</p>
-                )}
               </div>
 
               {/* Title */}
@@ -156,14 +148,24 @@ const BookForm = () => {
                 <label className="form-label">
                   Genre
                 </label>
-                <input
-                  type="text"
+                <select
                   name="genre"
                   value={formData.genre}
                   onChange={handleChange}
-                  className="form-input"
-                  placeholder="Fiction, Science, History, etc."
-                />
+                  className="form-select"
+                >
+                  <option value="">Select genre (optional)</option>
+                  <option value="Fiction">Fiction</option>
+                  <option value="Non-Fiction">Non-Fiction</option>
+                  <option value="Science">Science</option>
+                  <option value="History">History</option>
+                  <option value="Biography">Biography</option>
+                  <option value="Children">Children</option>
+                  <option value="Fantasy">Fantasy</option>
+                  <option value="Mystery">Mystery</option>
+                  <option value="Romance">Romance</option>
+                  <option value="Technology">Technology</option>
+                </select>
               </div>
 
               {/* Shelf Location */}
@@ -275,7 +277,7 @@ const BookForm = () => {
         <ul className="tips-list">
           <li className="tip-item">
             <span className="tip-bullet">•</span>
-            <span className="tip-text">ISBN must be unique for each book</span>
+            <span className="tip-text">ISBN is generated automatically for each new book</span>
           </li>
           <li className="tip-item">
             <span className="tip-bullet">•</span>

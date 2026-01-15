@@ -112,7 +112,6 @@
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  transform: translateY(-1px);
 }
 
 .form-input:hover:not(:focus),
@@ -169,17 +168,6 @@
   margin-top: 0.5rem;
   font-size: 0.813rem;
   color: #6b7280;
-}
-
-/* Number Input */
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
 }
 
 /* Select Dropdown */
@@ -407,6 +395,11 @@ input[type="number"]::-webkit-outer-spin-button {
 @media (min-width: 1025px) {
   .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form-group .form-input,
+  .form-group .form-select {
+    max-width: 90%;
   }
 }
 

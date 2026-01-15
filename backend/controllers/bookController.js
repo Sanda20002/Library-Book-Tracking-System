@@ -1,5 +1,16 @@
 const Book = require('../models/Book');
 
+// Generate a pseudo-ISBN that looks like a real one and is unique
+// Format example: 978-1-234-567890-1
+const generateRandomIsbn = () => {
+  const prefix = '978';
+  const group = Math.floor(Math.random() * 9) + 1; // 1-9
+  const registrant = String(Math.floor(100 + Math.random() * 900)); // 3 digits
+  const publication = String(Math.floor(100000 + Math.random() * 900000)); // 6 digits
+  const checkDigit = Math.floor(Math.random() * 10); // 0-9
+  return `${prefix}-${group}-${registrant}-${publication}-${checkDigit}`;
+};
+
 // Get all books
 exports.getAllBooks = async (req, res) => {
   try {
@@ -27,7 +38,6 @@ exports.getBookById = async (req, res) => {
 exports.addBook = async (req, res) => {
   try {
     const {
-      isbn,
       title,
       author,
       genre,
@@ -37,10 +47,22 @@ exports.addBook = async (req, res) => {
       availableCopies
     } = req.body;
 
-    // Check if book with ISBN already exists
-    const existingBook = await Book.findOne({ isbn });
-    if (existingBook) {
-      return res.status(400).json({ message: 'Book with this ISBN already exists' });
+    // Generate a unique ISBN for this book
+    let isbn;
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (!isbn && attempts < maxAttempts) {
+      attempts += 1;
+      const candidate = generateRandomIsbn();
+      const existingBook = await Book.findOne({ isbn: candidate });
+      if (!existingBook) {
+        isbn = candidate;
+      }
+    }
+
+    if (!isbn) {
+      return res.status(500).json({ message: 'Failed to generate unique ISBN' });
     }
 
     const book = new Book({

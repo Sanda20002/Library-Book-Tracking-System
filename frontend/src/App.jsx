@@ -6,6 +6,7 @@ import BookList from './components/BookList';
 import BookForm from './components/BookForm';
 import BorrowReturn from './components/BorrowReturn';
 import Footer from './components/Footer';
+import Chatbot from './components/Chatbot';
 import { NotificationProvider } from './context/NotificationContext';
 import MemberList from './components/MemberList';
 
@@ -27,6 +28,7 @@ function App() {
             </Routes>
           </div>
           <Footer />
+          <Chatbot />
         </div>
       </Router>
     </NotificationProvider>

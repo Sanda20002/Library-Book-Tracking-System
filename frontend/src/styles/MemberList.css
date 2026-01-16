@@ -276,6 +276,27 @@
     background-color: #dc2626;
 }
 
+.summary-btn {
+    padding: 6px 12px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.summary-btn:hover:enabled {
+    background-color: #2563eb;
+}
+
+.summary-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
 /* Empty State */
 .empty-state {
     text-align: center;
@@ -389,4 +410,98 @@
     opacity: 0;
     transform: translateY(-20px);
     transition: opacity 300ms, transform 300ms;
+}
+
+/* Member Summary Modal */
+.member-summary-modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9000;
+}
+
+.member-summary-content {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.member-summary-name {
+    margin: 0 0 4px 0;
+}
+
+.member-summary-id {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.member-summary-subtitle {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.member-summary-transactions {
+    margin-top: 4px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.member-summary-transactions table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.member-summary-transactions th,
+.member-summary-transactions td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.member-summary-transactions th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.member-summary-status {
+    text-transform: capitalize;
+}
+
+.member-summary-status-active {
+    color: #1d4ed8;
+}
+
+.member-summary-status-returned {
+    color: #059669;
+}
+
+.member-summary-status-overdue {
+    color: #b91c1c;
+}
+
+.summary-close-btn {
+    margin-top: 16px;
+    padding: 8px 14px;
+    background-color: #4b5563;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.summary-close-btn:hover {
+    background-color: #374151;
 }

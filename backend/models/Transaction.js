@@ -1,7 +1,15 @@
 const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
-  
+  // Link to the member who performed this transaction
+  member: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Member',
+  },
+  memberId: {
+    type: String,
+    trim: true,
+  },
   isbn: {
     type: String,
     required: true

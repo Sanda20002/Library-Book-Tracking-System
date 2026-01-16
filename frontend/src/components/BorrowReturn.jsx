@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { bookAPI, transactionAPI } from '../services/api';
+import { bookAPI, transactionAPI, memberAPI } from '../services/api';
 import { useNotification } from '../context/NotificationContext';
 import '../styles/BorrowReturn.css';
 
 const BorrowReturn = () => {
   const [activeSection, setActiveSection] = useState('borrow');
   const [books, setBooks] = useState([]);
+  const [members, setMembers] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [activeBorrowings, setActiveBorrowings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [borrowLoading, setBorrowLoading] = useState(false);
   const [returnLoading, setReturnLoading] = useState(false);
+  const [emailSendingId, setEmailSendingId] = useState(null);
   const { showNotification } = useNotification();
 
   // Borrow form state
   const [borrowForm, setBorrowForm] = useState({
     isbn: '',
-    borrowerName: '',
+    memberId: '',
     dueDays: 14
   });
 
@@ -36,6 +38,14 @@ const BorrowReturn = () => {
       // Always load books; this drives the dropdown
       const booksRes = await bookAPI.getAll();
 
+      // Load members for borrower selection
+      let membersRes;
+      try {
+        membersRes = await memberAPI.getAll();
+      } catch (error) {
+        console.error('Error fetching members:', error);
+      }
+
       // Load all transactions, but don't break if this fails
       let transactionsRes;
       try {
@@ -54,6 +64,7 @@ const BorrowReturn = () => {
       }
 
       setBooks(booksRes.data || []);
+      setMembers(membersRes?.data || []);
       setTransactions((transactionsRes?.data || []).slice(0, 10)); // Show only recent 10
       setActiveBorrowings(activeRes?.data || []);
     } catch (error) {
@@ -81,18 +92,31 @@ const BorrowReturn = () => {
   const handleBorrowSubmit = async (e) => {
     e.preventDefault();
     
-    if (!borrowForm.isbn || !borrowForm.borrowerName) {
+    if (!borrowForm.isbn || !borrowForm.memberId) {
       showNotification('Please fill in all required fields.', 'warning');
+      return;
+    }
+
+    const selectedMember = members.find((m) => m._id === borrowForm.memberId);
+    if (!selectedMember) {
+      showNotification('Selected member not found. Please refresh and try again.', 'error');
       return;
     }
 
     setBorrowLoading(true);
     
     try {
-      const response = await transactionAPI.borrow(borrowForm);
+      const payload = {
+        isbn: borrowForm.isbn,
+        memberId: borrowForm.memberId,
+        borrowerName: selectedMember.name,
+        dueDays: borrowForm.dueDays,
+      };
+
+      const response = await transactionAPI.borrow(payload);
       const dueDate = new Date(response.data.transaction.dueDate).toLocaleDateString();
       showNotification(`Book borrowed successfully! Due Date: ${dueDate}`, 'success');
-      setBorrowForm({ isbn: '', borrowerName: '', dueDays: 14 });
+      setBorrowForm({ isbn: '', memberId: '', dueDays: 14 });
       fetchData(); // Refresh data
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Error borrowing book';
@@ -239,20 +263,30 @@ const BorrowReturn = () => {
                   </p>
                 </div>
 
-                {/* Borrower Name Input */}
+                {/* Borrower Selection */}
                 <div className="form-field">
                   <label className="field-label">
-                    Borrower Name *
+                    Borrower *
                   </label>
-                  <input
-                    type="text"
-                    name="borrowerName"
-                    value={borrowForm.borrowerName}
-                    onChange={handleBorrowChange}
-                    required
-                    className="field-input"
-                    placeholder="Enter borrower's name"
-                  />
+                  <div>
+                    <select
+                      name="memberId"
+                      value={borrowForm.memberId}
+                      onChange={handleBorrowChange}
+                      required
+                      className="field-select"
+                    >
+                      <option value="">Select a member...</option>
+                      {members.map((member) => (
+                        <option key={member._id} value={member._id}>
+                          {member.memberId} - {member.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <p className="field-hint">
+                    Only registered members can borrow books
+                  </p>
                 </div>
 
                 {/* Due Days Slider */}
@@ -553,15 +587,35 @@ const BorrowReturn = () => {
                           </div>
                         </td>
                         <td>
-                          <button
-                            onClick={() => {
-                              setReturnForm({ transactionId: transaction._id });
-                              setActiveSection('return');
-                            }}
-                            className="return-btn"
-                          >
-                            Return
-                          </button>
+                          <div className="table-actions">
+                            <button
+                              onClick={() => {
+                                setReturnForm({ transactionId: transaction._id });
+                                setActiveSection('return');
+                              }}
+                              className="return-btn"
+                            >
+                              Return
+                            </button>
+                            <button
+                              className="email-btn"
+                              disabled={emailSendingId === transaction._id}
+                              onClick={async () => {
+                                try {
+                                  setEmailSendingId(transaction._id);
+                                  await transactionAPI.sendOverdueEmail(transaction._id);
+                                  showNotification('Overdue email sent successfully.', 'success');
+                                } catch (error) {
+                                  const msg = error.response?.data?.message || 'Failed to send overdue email.';
+                                  showNotification(msg, 'error');
+                                } finally {
+                                  setEmailSendingId(null);
+                                }
+                              }}
+                            >
+                              {emailSendingId === transaction._id ? 'Sending...' : 'Send Email'}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );

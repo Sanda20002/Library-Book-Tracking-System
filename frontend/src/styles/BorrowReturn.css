@@ -82,6 +82,34 @@
 
 .tab-btn:hover:not(.tab-active) {
   color: #374151;
+
+.table-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.email-btn {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.7rem;
+  border-radius: 999px;
+  border: none;
+  background-color: #3b82f6;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.email-btn:hover:enabled {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.email-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
   background: #f9fafb;
 }
 

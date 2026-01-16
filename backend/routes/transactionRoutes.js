@@ -17,4 +17,7 @@ router.post('/borrow', transactionController.borrowBook);
 // Return a book
 router.post('/return', transactionController.returnBook);
 
+// Send overdue email for a specific borrowing
+router.post('/:id/send-overdue-email', transactionController.sendOverdueEmail);
+
 module.exports = router;

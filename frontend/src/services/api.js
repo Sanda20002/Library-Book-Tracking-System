@@ -32,6 +32,8 @@ export const transactionAPI = {
   getDashboard: () => api.get('/transactions/dashboard'),
   borrow: (data) => api.post('/transactions/borrow', data),
   return: (data) => api.post('/transactions/return', data),
+  sendOverdueEmail: (transactionId) =>
+    api.post(`/transactions/${transactionId}/send-overdue-email`),
 };
 
 // Members API
@@ -43,6 +45,7 @@ export const memberAPI = {
   search: (query) => api.get(`/members/search?query=${query}`),
   update: (id, memberData) => api.put(`/members/${id}`, memberData),
   delete: (id) => api.delete(`/members/${id}`),
+  getSummary: (id) => api.get(`/members/${id}/summary`),
 };
 
 export default api;

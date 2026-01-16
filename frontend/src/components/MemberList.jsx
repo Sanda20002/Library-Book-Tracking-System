@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { memberAPI } from '../services/api';
+import { useNotification } from '../context/NotificationContext';
 import '../styles/MemberList.css';
 
 const MemberList = () => {
@@ -8,12 +9,16 @@ const MemberList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState('');
+  const [selectedMemberSummary, setSelectedMemberSummary] = useState(null);
+  const [summaryLoadingId, setSummaryLoadingId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     address: ''
   });
+
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     fetchMembers();
@@ -89,6 +94,32 @@ const MemberList = () => {
 
   const clearError = () => {
     setError('');
+  };
+
+   const handleViewSummary = async (memberId) => {
+    try {
+      setSummaryLoadingId(memberId);
+      const response = await memberAPI.getSummary(memberId);
+      setSelectedMemberSummary(response.data);
+    } catch (error) {
+      console.error('Error fetching member summary:', error);
+      showNotification('Failed to load member summary. Please try again.', 'error');
+    } finally {
+      setSummaryLoadingId(null);
+    }
+  };
+
+  const closeSummary = () => {
+    setSelectedMemberSummary(null);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
   };
 
   if (loading) return (
@@ -262,6 +293,13 @@ const MemberList = () => {
                   <td>
                     <div className="action-buttons">
                       <button
+                        onClick={() => handleViewSummary(member._id)}
+                        className="summary-btn"
+                        disabled={summaryLoadingId === member._id}
+                      >
+                        {summaryLoadingId === member._id ? 'Loading...' : 'View Summary'}
+                      </button>
+                      <button
                         onClick={() => handleDelete(member._id)}
                         className="delete-btn"
                       >
@@ -275,6 +313,69 @@ const MemberList = () => {
           </tbody>
         </table>
       </div>
+
+      {selectedMemberSummary && (
+        <div className="member-summary-modal">
+          <div className="member-summary-content">
+            <h3>Member Summary</h3>
+            <p className="member-summary-name">
+              <strong>{selectedMemberSummary.member.name}</strong>{' '}
+              <span className="member-summary-id">({selectedMemberSummary.member.memberId})</span>
+            </p>
+            <p>Email: {selectedMemberSummary.member.email}</p>
+            <p>Phone: {selectedMemberSummary.member.phone}</p>
+            {selectedMemberSummary.member.address && (
+              <p>Address: {selectedMemberSummary.member.address}</p>
+            )}
+            <hr />
+            <p>Current Borrowed: {selectedMemberSummary.stats.currentBorrowed}</p>
+            <p>Total Borrowed: {selectedMemberSummary.stats.totalBorrowed}</p>
+            <p>Returned Books: {selectedMemberSummary.stats.returnedBooks}</p>
+            <p>Overdue Books: {selectedMemberSummary.stats.overdueBooks}</p>
+            <p>
+              Total Fine Amount: 
+              <strong> Rs.{selectedMemberSummary.stats.totalFinePaid.toFixed(2)}</strong>
+            </p>
+
+            <h4 className="member-summary-subtitle">Borrowed Books</h4>
+            {selectedMemberSummary.transactions && selectedMemberSummary.transactions.length > 0 ? (
+              <div className="member-summary-transactions">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Book</th>
+                      <th>Status</th>
+                      <th>Borrowed</th>
+                      <th>Due</th>
+                      <th>Returned</th>
+                      <th>Fine</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedMemberSummary.transactions.map((t) => (
+                      <tr key={t._id}>
+                        <td>{t.bookTitle}</td>
+                        <td className={`member-summary-status member-summary-status-${t.status}`}>
+                          {t.status}
+                        </td>
+                        <td>{formatDate(t.borrowedDate)}</td>
+                        <td>{formatDate(t.dueDate)}</td>
+                        <td>{formatDate(t.returnedDate)}</td>
+                        <td>{t.fineAmount ? `₹${t.fineAmount.toFixed(2)}` : '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p>No borrowing history available for this member.</p>
+            )}
+            <button className="summary-close-btn" onClick={closeSummary}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,11 +1,18 @@
 const mongoose = require('mongoose');
 
+// Helper to generate a member ID like MEM20260001
+const generateMemberId = () => {
+  const year = new Date().getFullYear();
+  const random = Math.floor(1000 + Math.random() * 9000);
+  return `MEM${year}${random}`;
+};
+
 const memberSchema = new mongoose.Schema({
   memberId: {
     type: String,
-    required: true,
     unique: true,
-    trim: true
+    trim: true,
+    default: generateMemberId
   },
   name: {
     type: String,
@@ -50,16 +57,6 @@ const memberSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true
-});
-
-// Generate member ID before saving
-memberSchema.pre('save', function(next) {
-  if (this.isNew) {
-    const year = new Date().getFullYear();
-    const random = Math.floor(1000 + Math.random() * 9000);
-    this.memberId = `MEM${year}${random}`;
-  }
-  next();
 });
 
 module.exports = mongoose.model('Member', memberSchema);

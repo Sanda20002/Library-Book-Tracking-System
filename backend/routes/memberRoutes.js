@@ -11,6 +11,9 @@ router.get('/', memberController.getAllMembers);
 // Search members
 router.get('/search', memberController.searchMembers);
 
+// Member summary
+router.get('/:id/summary', memberController.getMemberSummary);
+
 // Get member by email
 router.get('/email/:email', memberController.getMemberByEmail);
 

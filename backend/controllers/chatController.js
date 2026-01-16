@@ -27,8 +27,26 @@ function getIntent(message) {
     return 'contact';
   }
 
+  // Member's full borrowing history style questions
+  if (
+    (text.includes('what') || text.includes('which')) &&
+    text.includes('book') &&
+    (text.includes('this member') || text.includes('member')) &&
+    text.includes('borrowed')
+  ) {
+    return 'memberBorrowHistory';
+  }
+
   if (text.includes('overdue') || text.includes('late')) {
     return 'overdue';
+  }
+
+  // Members who have fines recorded (global question)
+  if (
+    (text.includes('members') || text.includes('which') || text.includes('who')) &&
+    (text.includes('fine') || text.includes('fines') || text.includes('penalty') || text.includes('fees'))
+  ) {
+    return 'membersWithFines';
   }
 
   if (text.includes('fine') || text.includes('penalty') || text.includes('fees')) {
@@ -130,7 +148,16 @@ exports.handleChat = async (req, res) => {
 
     if (
       !member &&
-      !['general', 'hours', 'contact', 'availableBooks', 'borrowedBooksAll', 'returnedOnDate', 'borrowedOnDate'].includes(intent)
+      ![
+        'general',
+        'hours',
+        'contact',
+        'availableBooks',
+        'borrowedBooksAll',
+        'returnedOnDate',
+        'borrowedOnDate',
+        'membersWithFines',
+      ].includes(intent)
     ) {
       return res.json({
         reply:
@@ -250,6 +277,106 @@ exports.handleChat = async (req, res) => {
           `• Total books ever borrowed: ${member.totalBorrowed || 0}\n` +
           `• Overdue cases on record: ${member.overDueBooks || 0}\n` +
           'For detailed history of every transaction, please see the member summary screen used by staff.',
+      });
+    }
+
+    if (intent === 'memberBorrowHistory') {
+      const borrows = await Transaction.find({
+        $or: [
+          { member: member._id },
+          { memberId: member.memberId },
+        ],
+        transactionType: 'borrow',
+      })
+        .sort({ borrowedDate: -1 })
+        .limit(30);
+
+      if (borrows.length === 0) {
+        return res.json({
+          reply: `This member (${member.name}) has no recorded borrowings in the system.`,
+        });
+      }
+
+      const lines = borrows.map((t, index) => {
+        const borrowed = t.borrowedDate ? t.borrowedDate.toDateString() : 'N/A';
+        const returned = t.returnedDate ? t.returnedDate.toDateString() : 'Not yet returned';
+        const status = t.status ? t.status : (t.returnedDate ? 'returned' : 'active');
+        return (
+          `#${index + 1}\n` +
+          `Title      : ${t.bookTitle}\n` +
+          `ISBN       : ${t.isbn}\n` +
+          `Borrowed on: ${borrowed}\n` +
+          `Returned on: ${returned}\n` +
+          `Status     : ${status}`
+        );
+      });
+
+      return res.json({
+        reply:
+          `Borrowing history for ${member.name} (ID: ${member.memberId}) – latest ${borrows.length} record(s):\n\n` +
+          lines.join('\n\n'),
+      });
+    }
+
+    if (intent === 'membersWithFines') {
+      const finedReturns = await Transaction.find({
+        transactionType: 'return',
+        fineAmount: { $gt: 0 },
+      }).sort({ returnedDate: -1 });
+
+      if (finedReturns.length === 0) {
+        return res.json({
+          reply: 'No members currently have any recorded fines in the system.',
+        });
+      }
+
+      const aggregateByMember = new Map();
+
+      for (const t of finedReturns) {
+        const key = t.memberId || t.borrowerName || 'Unknown';
+        if (!aggregateByMember.has(key)) {
+          aggregateByMember.set(key, {
+            memberId: t.memberId || '',
+            name: t.borrowerName || 'Unknown name',
+            totalFine: 0,
+            count: 0,
+            latestReturn: t.returnedDate || null,
+          });
+        }
+        const entry = aggregateByMember.get(key);
+        entry.totalFine += t.fineAmount || 0;
+        entry.count += 1;
+        if (t.returnedDate && (!entry.latestReturn || t.returnedDate > entry.latestReturn)) {
+          entry.latestReturn = t.returnedDate;
+        }
+      }
+
+      const membersWithFines = Array.from(aggregateByMember.values())
+        .sort((a, b) => {
+          if (b.totalFine !== a.totalFine) return b.totalFine - a.totalFine;
+          if (a.latestReturn && b.latestReturn) return b.latestReturn - a.latestReturn;
+          return 0;
+        })
+        .slice(0, 50);
+
+      const lines = membersWithFines.map((m, index) => {
+        const lastDate = m.latestReturn ? m.latestReturn.toDateString() : 'N/A';
+        const memberIdLine = m.memberId ? m.memberId : 'Not recorded';
+        return (
+          `#${index + 1}\n` +
+          `Name       : ${m.name}\n` +
+          `Member ID  : ${memberIdLine}\n` +
+          `Returns    : ${m.count} with fines\n` +
+          `Total fines: Rs. ${m.totalFine}\n` +
+          `Last fine  : ${lastDate}`
+        );
+      });
+
+      return res.json({
+        reply:
+          'These members have recorded fines in the system (top 50 by total fines):\n\n' +
+          lines.join('\n\n') +
+          '\n\nNote: This list is based on recorded fine amounts from return transactions and does not track whether fines have later been paid.',
       });
     }
 
@@ -429,6 +556,7 @@ exports.handleChat = async (req, res) => {
         '• "How can I contact the library?"\n' +
         '• "Give me available booklist"\n' +
         '• "What are the borrowed books and who borrowed them"\n' +
+        '• "Which members currently have fines?"\n' +
         '• "What are the borrowed books on 15 Jan 2026"\n' +
         '• "What are the returned books on 15 Jan 2026"\n' +
         '• "What books has this member borrowed?" (include the member ID)\n' +

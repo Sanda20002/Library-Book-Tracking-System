@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import '../styles/Chatbot.css';
 
@@ -14,6 +14,7 @@ const Chatbot = () => {
     },
   ]);
   const [sending, setSending] = useState(false);
+  const messagesEndRef = useRef(null);
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
@@ -46,6 +47,12 @@ const Chatbot = () => {
       setSending(false);
     }
   };
+
+  useEffect(() => {
+    if (isOpen && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [messages, isOpen]);
 
   return (
     <div className="chatbot-container">
@@ -81,6 +88,7 @@ const Chatbot = () => {
                 ))}
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
           <form className="chatbot-input-row" onSubmit={handleSend}>
             <input
@@ -98,7 +106,7 @@ const Chatbot = () => {
       )}
 
       <button className="chatbot-toggle" onClick={toggleOpen}>
-        {isOpen ? 'Close Chat' : 'Chat with us'}
+        {isOpen ? 'Close Assistant' : 'Ask Library Assistant'}
       </button>
     </div>
   );

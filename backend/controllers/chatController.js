@@ -27,10 +27,6 @@ function getIntent(message) {
     return 'contact';
   }
 
-  if (text.includes('borrowed') || text.includes('my books') || text.includes('currently have') || text.includes('currently borrowed')) {
-    return 'currentBorrowed';
-  }
-
   if (text.includes('overdue') || text.includes('late')) {
     return 'overdue';
   }
@@ -41,6 +37,26 @@ function getIntent(message) {
 
   if (text.includes('summary') || text.includes('history') || text.includes('activity')) {
     return 'summary';
+  }
+
+  // Date-based borrowed books (e.g. "borrowed books on 15 Jan 2026")
+  if (
+    (text.includes('borrowed books') || text.includes('books borrowed') || text.includes('borrowed')) &&
+    text.includes('on')
+  ) {
+    return 'borrowedOnDate';
+  }
+
+  // Member's currently borrowed books
+  if (
+    text.includes('currently borrowed') ||
+    text.includes('currently have') ||
+    text.includes('current borrowed') ||
+    text.includes('current books') ||
+    text.includes('my books') ||
+    (text.includes('borrowed') && (text.includes('now') || text.includes('right now')))
+  ) {
+    return 'currentBorrowed';
   }
 
    // Global, admin-style questions
@@ -114,7 +130,7 @@ exports.handleChat = async (req, res) => {
 
     if (
       !member &&
-      !['general', 'hours', 'contact', 'availableBooks', 'borrowedBooksAll', 'returnedOnDate'].includes(intent)
+      !['general', 'hours', 'contact', 'availableBooks', 'borrowedBooksAll', 'returnedOnDate', 'borrowedOnDate'].includes(intent)
     ) {
       return res.json({
         reply:
@@ -144,15 +160,20 @@ exports.handleChat = async (req, res) => {
         });
       }
 
-      const lines = activeBorrows.map((t) => {
+      const lines = activeBorrows.map((t, index) => {
         const due = t.dueDate ? t.dueDate.toDateString() : 'N/A';
-        return `• ${t.bookTitle} (ISBN: ${t.isbn}) – due on ${due}`;
+        return (
+          `#${index + 1}\n` +
+          `Title : ${t.bookTitle}\n` +
+          `ISBN  : ${t.isbn}\n` +
+          `Due   : ${due}`
+        );
       });
 
       return res.json({
         reply:
-          `This member (${member.name}) currently has ${activeBorrows.length} active borrowing(s):\n` +
-          lines.join('\n'),
+          `This member (${member.name}) currently has ${activeBorrows.length} active borrowing(s):\n\n` +
+          lines.join('\n\n'),
       });
     }
 
@@ -174,16 +195,24 @@ exports.handleChat = async (req, res) => {
         });
       }
 
-      const lines = overdueBorrows.map((t) => {
+      const lines = overdueBorrows.map((t, index) => {
         const daysOverdue = Math.ceil((now - t.dueDate) / (1000 * 60 * 60 * 24));
         const fine = daysOverdue * 100; // matches your Rs.100/day policy
-        return `• ${t.bookTitle} (ISBN: ${t.isbn}) – overdue by ${daysOverdue} day(s), estimated fine Rs. ${fine}`;
+        const due = t.dueDate ? t.dueDate.toDateString() : 'N/A';
+        return (
+          `#${index + 1}\n` +
+          `Title    : ${t.bookTitle}\n` +
+          `ISBN     : ${t.isbn}\n` +
+          `Due date : ${due}\n` +
+          `Overdue  : ${daysOverdue} day(s)\n` +
+          `Fine est.: Rs. ${fine}`
+        );
       });
 
       return res.json({
         reply:
-          `This member currently has ${overdueBorrows.length} overdue book(s):\n` +
-          lines.join('\n') +
+          `This member currently has ${overdueBorrows.length} overdue book(s):\n\n` +
+          lines.join('\n\n') +
           '\n\nPlease inform the member to return them as soon as possible.',
       });
     }
@@ -233,16 +262,23 @@ exports.handleChat = async (req, res) => {
         });
       }
 
-      const lines = books.map((b) => {
+      const lines = books.map((b, index) => {
         const copies = `${b.availableCopies}/${b.totalCopies} copies`;
-        const shelf = b.shelfLocation ? ` – Shelf: ${b.shelfLocation}` : '';
-        return `• ${b.title} by ${b.author} (ISBN: ${b.isbn}) – ${copies}${shelf}`;
+        const shelf = b.shelfLocation ? `${b.shelfLocation}` : 'Not specified';
+        return (
+          `#${index + 1}\n` +
+          `Title   : ${b.title}\n` +
+          `Author  : ${b.author}\n` +
+          `ISBN    : ${b.isbn}\n` +
+          `Copies  : ${copies}\n` +
+          `Shelf   : ${shelf}`
+        );
       });
 
       return res.json({
         reply:
-          `Here is a sample of available books (up to 20):\n` +
-          lines.join('\n') +
+          `Here is a sample of available books (up to 20):\n\n` +
+          lines.join('\n\n') +
           '\n\nFor the full list, please use the main Books page.',
       });
     }
@@ -261,16 +297,74 @@ exports.handleChat = async (req, res) => {
         });
       }
 
-      const lines = activeBorrows.map((t) => {
+      const lines = activeBorrows.map((t, index) => {
         const due = t.dueDate ? t.dueDate.toDateString() : 'N/A';
         const memberTag = t.memberId ? ` (Member ID: ${t.memberId})` : '';
-        return `• ${t.bookTitle} (ISBN: ${t.isbn}) – borrowed by ${t.borrowerName}${memberTag}, due on ${due}`;
+        return (
+          `#${index + 1}\n` +
+          `Title    : ${t.bookTitle}\n` +
+          `ISBN     : ${t.isbn}\n` +
+          `Borrower : ${t.borrowerName}${memberTag}\n` +
+          `Due date : ${due}`
+        );
       });
 
       return res.json({
         reply:
-          `Here are up to 50 currently borrowed books and who borrowed them:\n` +
-          lines.join('\n'),
+          `Here are up to 50 currently borrowed books and who borrowed them:\n\n` +
+          lines.join('\n\n'),
+      });
+    }
+
+    if (intent === 'borrowedOnDate') {
+      // Try to extract a date from the message text.
+      const raw = message
+        .replace(/\b(\d+)(st|nd|rd|th)\b/gi, '$1')
+        .replace(/\s+/g, ' ');
+      const parsed = Date.parse(raw);
+
+      if (Number.isNaN(parsed)) {
+        return res.json({
+          reply:
+            'Please specify the date more clearly, for example: "What are the borrowed books on 15 Jan 2026" or "borrowed books on 2026-01-15".',
+        });
+      }
+
+      const day = new Date(parsed);
+      const start = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+      const end = new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1);
+
+      const borrows = await Transaction.find({
+        transactionType: 'borrow',
+        borrowedDate: { $gte: start, $lt: end },
+      }).sort({ borrowedDate: 1 });
+
+      const niceDate = start.toDateString();
+
+      if (borrows.length === 0) {
+        return res.json({
+          reply: `No books were recorded as borrowed on ${niceDate}.`,
+        });
+      }
+
+      const lines = borrows.map((t, index) => {
+        const time = t.borrowedDate ? t.borrowedDate.toTimeString().slice(0, 5) : '';
+        const memberTag = t.memberId ? ` (Member ID: ${t.memberId})` : '';
+        const due = t.dueDate ? t.dueDate.toDateString() : 'N/A';
+        return (
+          `#${index + 1}\n` +
+          `Title    : ${t.bookTitle}\n` +
+          `ISBN     : ${t.isbn}\n` +
+          `Borrower : ${t.borrowerName}${memberTag}\n` +
+          `Time     : ${time}\n` +
+          `Due date : ${due}`
+        );
+      });
+
+      return res.json({
+        reply:
+          `Books borrowed on ${niceDate}:\n\n` +
+          lines.join('\n\n'),
       });
     }
 
@@ -305,17 +399,24 @@ exports.handleChat = async (req, res) => {
         });
       }
 
-      const lines = returns.map((t) => {
+      const lines = returns.map((t, index) => {
         const time = t.returnedDate ? t.returnedDate.toTimeString().slice(0, 5) : '';
         const memberTag = t.memberId ? ` (Member ID: ${t.memberId})` : '';
-        const fine = t.fineAmount > 0 ? ` – Fine: Rs. ${t.fineAmount}` : '';
-        return `• ${t.bookTitle} (ISBN: ${t.isbn}) – returned by ${t.borrowerName}${memberTag} at ${time}${fine}`;
+        const fine = t.fineAmount > 0 ? `Rs. ${t.fineAmount}` : 'None';
+        return (
+          `#${index + 1}\n` +
+          `Title    : ${t.bookTitle}\n` +
+          `ISBN     : ${t.isbn}\n` +
+          `Borrower : ${t.borrowerName}${memberTag}\n` +
+          `Time     : ${time}\n` +
+          `Fine     : ${fine}`
+        );
       });
 
       return res.json({
         reply:
-          `Books returned on ${niceDate}:\n` +
-          lines.join('\n'),
+          `Books returned on ${niceDate}:\n\n` +
+          lines.join('\n\n'),
       });
     }
 
@@ -328,6 +429,7 @@ exports.handleChat = async (req, res) => {
         '• "How can I contact the library?"\n' +
         '• "Give me available booklist"\n' +
         '• "What are the borrowed books and who borrowed them"\n' +
+        '• "What are the borrowed books on 15 Jan 2026"\n' +
         '• "What are the returned books on 15 Jan 2026"\n' +
         '• "What books has this member borrowed?" (include the member ID)\n' +
         '• "Does this member have any overdue books?"',

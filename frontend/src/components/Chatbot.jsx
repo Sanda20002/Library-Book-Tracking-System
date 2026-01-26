@@ -112,4 +112,5 @@ const Chatbot = () => {
   );
 };
 
+//export the component
 export default Chatbot;

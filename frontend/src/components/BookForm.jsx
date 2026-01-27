@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../context/NotificationContext';
 import '../styles/BookForm.css';
 
+//component to add a new book
 const BookForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({

@@ -380,4 +380,5 @@ const MemberList = () => {
   );
 };
 
+//export the component
 export default MemberList;

@@ -74,7 +74,8 @@ const BookForm = () => {
       setLoading(false);
     }
   };
-
+  
+  // Reset form fields
   const handleReset = () => {
     setFormData({
       title: '',

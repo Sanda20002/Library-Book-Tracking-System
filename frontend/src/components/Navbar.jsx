@@ -38,4 +38,5 @@ const Navbar = () => {
   );
 };
 
+//export the component
 export default Navbar;

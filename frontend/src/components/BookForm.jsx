@@ -34,7 +34,8 @@ const BookForm = () => {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
-
+  
+  // Form validation
   const validateForm = () => {
     const newErrors = {};
     

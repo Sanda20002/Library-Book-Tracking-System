@@ -16,7 +16,8 @@ const BookForm = () => {
     availableCopies: 1,
     status: 'available'
   });
-
+  
+  // loading state and error state
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const { showNotification } = useNotification();

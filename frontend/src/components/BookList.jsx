@@ -83,6 +83,7 @@ const BookList = () => {
     }
   };
 
+  //function to confirm deletion
   const confirmDelete = async () => {
     if (!bookToDelete) return;
 

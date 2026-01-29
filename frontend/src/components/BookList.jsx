@@ -56,7 +56,7 @@ const BookList = () => {
     setLocationDraft(book.shelfLocation || '');
   };
   
-  
+  //function to cancel editing location
   const cancelEditLocation = () => {
     setEditingLocationId(null);
     setLocationDraft('');

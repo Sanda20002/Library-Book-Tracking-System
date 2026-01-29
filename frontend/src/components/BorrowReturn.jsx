@@ -91,6 +91,7 @@ const BorrowReturn = () => {
     });
   };
 
+  //Handle borrow form submission
   const handleBorrowSubmit = async (e) => {
     e.preventDefault();
     

@@ -100,6 +100,7 @@ const BorrowReturn = () => {
       return;
     }
 
+    //Find selected member details
     const selectedMember = members.find((m) => m._id === borrowForm.memberId);
     if (!selectedMember) {
       showNotification('Selected member not found. Please refresh and try again.', 'error');
@@ -129,6 +130,7 @@ const BorrowReturn = () => {
     }
   };
 
+  //Handle return form submission
   const handleReturnSubmit = async (e) => {
     e.preventDefault();
     

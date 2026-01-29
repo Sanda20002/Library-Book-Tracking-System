@@ -3,6 +3,7 @@ import { bookAPI } from '../services/api';
 import { useNotification } from '../context/NotificationContext';
 import '../styles/BookList.css';
 
+//component to display and manage a list of books
 const BookList = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +29,7 @@ const BookList = () => {
       setLoading(false);
     }
   };
-
+  //function to handle search
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
       fetchBooks();
@@ -43,7 +44,7 @@ const BookList = () => {
       showNotification('Search failed. Please try again.', 'error');
     }
   };
-
+  //function to handle delete click
   const handleDeleteClick = (book) => {
     setBookToDelete(book);
     setShowDeleteModal(true);

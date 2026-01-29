@@ -100,6 +100,7 @@ const BookList = () => {
     }
   };
 
+  //render loading state
   if (loading) {
     return (
       <div className="loading-container">

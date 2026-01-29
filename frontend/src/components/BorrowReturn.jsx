@@ -75,6 +75,7 @@ const BorrowReturn = () => {
     }
   };
 
+  //Handle form input changes
   const handleBorrowChange = (e) => {
     setBorrowForm({
       ...borrowForm,
@@ -82,6 +83,7 @@ const BorrowReturn = () => {
     });
   };
 
+  //Handle return form input changes
   const handleReturnChange = (e) => {
     setReturnForm({
       ...returnForm,

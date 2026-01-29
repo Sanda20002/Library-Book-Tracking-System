@@ -49,12 +49,14 @@ const BookList = () => {
     setBookToDelete(book);
     setShowDeleteModal(true);
   };
-
+  
+  //functions to handle editing location
   const startEditLocation = (book) => {
     setEditingLocationId(book._id);
     setLocationDraft(book.shelfLocation || '');
   };
-
+  
+  
   const cancelEditLocation = () => {
     setEditingLocationId(null);
     setLocationDraft('');

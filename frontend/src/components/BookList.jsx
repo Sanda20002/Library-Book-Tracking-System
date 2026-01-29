@@ -62,6 +62,7 @@ const BookList = () => {
     setLocationDraft('');
   };
 
+  //function to save updated location
   const saveLocation = async (book) => {
     const trimmed = locationDraft.trim();
     if (!trimmed) {

@@ -65,6 +65,7 @@ const BorrowReturn = () => {
         console.error('Error fetching active borrowings:', error);
       }
 
+      // Set state with fetched data
       setBooks(booksRes.data || []);
       setMembers(membersRes?.data || []);
       setTransactions((transactionsRes?.data || []).slice(0, 10)); // Show only recent 10

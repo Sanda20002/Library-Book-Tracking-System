@@ -110,6 +110,7 @@ const BorrowReturn = () => {
       return;
     }
 
+    // Proceed with borrowing
     setBorrowLoading(true);
     
     try {

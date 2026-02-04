@@ -33,6 +33,7 @@ const BorrowReturn = () => {
     fetchData();
   }, []);
 
+  // Fetch books, members, transactions, and active borrowings
   const fetchData = async () => {
     setLoading(true);
     try {

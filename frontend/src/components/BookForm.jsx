@@ -60,6 +60,7 @@ const BookForm = () => {
       return;
     }
 
+    // Proceed with API call
     setLoading(true);
     
     try {

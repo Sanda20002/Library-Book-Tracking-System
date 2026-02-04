@@ -90,6 +90,7 @@ const BookForm = () => {
     setErrors({});
   };
 
+  // Render the form
   return (
     <div className="book-form">
       <div className="form-header">
